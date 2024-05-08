@@ -30,12 +30,16 @@ type ServerConfig struct {
 	WatchMode bool
 }
 
+var supportedUiPaths = [...]string{
+	"/",
+	"/login",
+	"/about",
+}
+
 func main() {
 	if mode == "" {
 		mode = MODE_RELEASE
 	}
-
-	println("built in mode", mode)
 
 	serverConfig := ServerConfig{
 		Port:      "3000",
@@ -43,7 +47,7 @@ func main() {
 		WatchMode: mode == MODE_WATCH,
 	}
 
-	temp, err := template.ParseFS(publicRoot, "templates/index.html")
+	layout, err := template.ParseFS(publicRoot, "templates/index.html")
 
 	if err != nil {
 		println(err.Error())
@@ -66,7 +70,7 @@ func main() {
 		Root:       content,
 		PathPrefix: "public",
 		Browse:     true,
-		MaxAge:     60 * 60 * 24 * 30, // 30days
+		MaxAge:     60 * 60 * 24 * 7, // 7days
 	}
 
 	if serverConfig.WatchMode {
@@ -83,11 +87,27 @@ func main() {
 	})
 
 	server.Get("*", func(c fiber.Ctx) error {
+		path := string(c.Context().Request.URI().Path())
+
+		if !isPathSupported(path) {
+			c.Context().NotFound()
+			return nil
+		}
+
 		c.Context().Response.Header.SetStatusCode(http.StatusOK)
 		c.Context().Response.Header.Add("Content-Type", "text/html")
 
-		return temp.Execute(c.Context().Response.BodyWriter(), serverConfig)
+		return layout.Execute(c.Context().Response.BodyWriter(), serverConfig)
 	})
 
 	server.Listen(serverConfig.Host + ":" + serverConfig.Port)
+}
+
+func isPathSupported(requestedPath string) bool {
+	for _, path := range supportedUiPaths {
+		if requestedPath == path {
+			return true
+		}
+	}
+	return false
 }

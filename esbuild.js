@@ -1,5 +1,6 @@
 const esbuild = require('esbuild');
 const postCssPlugin = require('esbuild-style-plugin');
+const copyPlugin = require('esbuild-plugin-copy').copy;
 
 const isWatchMode = process.env.MODE === 'watch';
 const isProdMode = process.env.MODE !== 'dev' && !isWatchMode;
@@ -18,6 +19,18 @@ const bundleOptions = {
         plugins: [require('tailwindcss'), require('autoprefixer')],
       },
     }),
+    copyPlugin({
+      assets: [
+        {
+          from: ['./frontend/assets/logo-*.svg'],
+          to: ['./'],
+        },
+        {
+          from: ['./frontend/assets/favicons/**'],
+          to: ['./'],
+        },
+      ],
+    })
   ],
 };
 
