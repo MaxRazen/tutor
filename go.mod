@@ -1,4 +1,4 @@
-module github.com/hexnet/tutor
+module github.com/MaxRazen/tutor
 
 go 1.22.2
 

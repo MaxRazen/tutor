@@ -4,14 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "MODE=dev node esbuild.js",
-    "watch": "MODE=watch node esbuild.js",
-    "prod": "node esbuild.js",
+    "dev": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "prod": "ENV=production node esbuild.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Max Razen",
   "license": "ISC",
+  "engines": {
+    "npm": ">=9.6.7",
+    "node": ">=18.17.0 <= 20.x"
+  },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

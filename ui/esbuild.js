@@ -2,17 +2,16 @@ const esbuild = require('esbuild');
 const postCssPlugin = require('esbuild-style-plugin');
 const copyPlugin = require('esbuild-plugin-copy').copy;
 
-const isWatchMode = process.env.MODE === 'watch';
-const isProdMode = process.env.MODE !== 'dev' && !isWatchMode;
+const isWatchMode = process.argv.includes('--watch');
+const isProdMode = process.env.ENV === 'production';
 
 /** @type {esbuild.BuildContext} */
 const bundleOptions = {
-  entryPoints: ['frontend/app/app.tsx'],
+  entryPoints: ['./app/app.tsx'],
   assetNames: 'assets/[name]-[hash]',
   outdir: 'public',
   bundle: true,
   minify: isProdMode,
-  metafile: true,
   plugins: [
     postCssPlugin({
       postcss: {
@@ -22,11 +21,11 @@ const bundleOptions = {
     copyPlugin({
       assets: [
         {
-          from: ['./frontend/assets/logo-*.svg'],
+          from: ['./assets/**'],
           to: ['./'],
         },
         {
-          from: ['./frontend/assets/favicons/**'],
+          from: ['./favicons/**'],
           to: ['./'],
         },
       ],
@@ -49,5 +48,3 @@ if (isWatchMode) {
     .build(bundleOptions)
     .catch(onError);
 }
-
-
