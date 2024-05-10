@@ -6,6 +6,8 @@ import (
 
 	"github.com/MaxRazen/tutor/internal/config"
 	"github.com/MaxRazen/tutor/internal/routes"
+	"github.com/MaxRazen/tutor/pkg/google"
+	"github.com/MaxRazen/tutor/pkg/oauth"
 
 	fiber "github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/compress"
@@ -20,6 +22,7 @@ type ServerConfig struct {
 
 func InitServer(cfg config.RuntimeConfig) {
 	server := fiber.New()
+	routes.SetRootTemplate(&publicRoot)
 
 	compressConfig := compress.Config{
 		Level: compress.LevelDefault,
@@ -44,13 +47,23 @@ func InitServer(cfg config.RuntimeConfig) {
 	server.Use("/assets", filesystem.New(filesystemConfig))
 
 	server.Get("/auth/redirect/:provider", routes.AuthRedirect())
-	server.Get("/auth/callback", routes.AuthCallback())
+	server.Get("/auth/callback/:provider", routes.AuthCallback())
 
-	server.Get("*", routes.HomeHandler(&publicRoot))
+	server.Get("*", routes.HomeHandler())
 
 	err := server.Listen(cfg.GetServerHost())
 
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
+}
+
+func InitOAuthProviders() {
+	provider := google.New(
+		config.GetEnv(config.GOOGLE_OAUTH_CLIENT_ID, ""),
+		config.GetEnv(config.GOOGLE_OAUTH_SECRET, ""),
+		config.GetEnv(config.GOOGLE_OAUTH_CALLBACK_URL, ""),
+		[]string{},
+	)
+	oauth.UseProvider(provider)
 }

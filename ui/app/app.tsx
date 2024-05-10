@@ -6,7 +6,8 @@ import {
 } from 'react-router-dom';
 import Home from './pages/Home';
 import About from './pages/About';
-import Login from './pages/Login';
+import AuthLogin from './pages/auth/Login';
+import AuthCallback from './pages/auth/Callback';
 import '../styles/main.scss';
 
 const router = createBrowserRouter([
@@ -20,7 +21,11 @@ const router = createBrowserRouter([
     },
     {
         path: '/login',
-        element: <Login/>,
+        element: <AuthLogin/>,
+    },
+    {
+        path: '/auth/callback/:provider',
+        element: <AuthCallback/>,
     },
 ]);
 

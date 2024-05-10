@@ -20,10 +20,12 @@ ui-watch:
 	@$(MAKE) --no-print-directory clean
 	@cd ui && npm run watch
 
+
 .PHONY: ui-build
 ui-build:
 	@$(MAKE) --no-print-directory clean
 	@cd ui && npm run prod
+
 
 .PHONY: clean
 clean: ## Clean generated files, logs, caches
