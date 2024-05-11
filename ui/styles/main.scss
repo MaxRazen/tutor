@@ -3,5 +3,13 @@
 @tailwind utilities;
 
 body {
-    @apply bg-slate-700 text-slate-100;
+    @apply bg-gray-900 text-gray-400;
+}
+
+.container {
+    @apply max-w-screen-xl mx-auto;
+}
+
+.btn-link {
+    @apply w-full p-4 border border-gray-700 rounded-lg flex items-center justify-center hover:border-gray-600 hover:bg-gray-700;
 }

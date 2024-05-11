@@ -23,6 +23,7 @@ type ServerConfig struct {
 func InitServer(cfg config.RuntimeConfig) {
 	server := fiber.New()
 	routes.SetRootTemplate(&publicRoot)
+	authMiddleware := routes.NewAuthMiddleware()
 
 	compressConfig := compress.Config{
 		Level: compress.LevelDefault,
@@ -49,7 +50,7 @@ func InitServer(cfg config.RuntimeConfig) {
 	server.Get("/auth/redirect/:provider", routes.AuthRedirect())
 	server.Get("/auth/callback/:provider", routes.AuthCallback())
 
-	server.Get("*", routes.HomeHandler())
+	server.Get("*", routes.HomeHandler(), authMiddleware)
 
 	err := server.Listen(cfg.GetServerHost())
 

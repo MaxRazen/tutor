@@ -40,14 +40,20 @@ func (p *Provider) BeginAuth(state string) string {
 }
 
 func (p *Provider) CompleteAuth(callbackQuery map[string]string) (*auth.User, error) {
-	token, err := p.config.Exchange(context.Background(), callbackQuery["code"])
+	code, ok := callbackQuery["code"]
+
+	if !ok {
+		return nil, errors.New("oauth/google: missing required parameter code")
+	}
+
+	token, err := p.config.Exchange(context.Background(), code)
 
 	if err != nil {
 		return nil, err
 	}
 
 	if !token.Valid() {
-		return nil, errors.New("invalid token received from 'google'")
+		return nil, errors.New("oauth/google: invalid token received from 'google'")
 	}
 
 	u, err := p.fetchUser(token.AccessToken)
@@ -87,7 +93,7 @@ func (p *Provider) fetchUser(accessToken string) (*googleUser, error) {
 
 	var u googleUser
 	if err = json.Unmarshal(body, &u); err != nil {
-		return nil, fmt.Errorf("oauth/googe: body could not be deserialized: %v", err)
+		return nil, fmt.Errorf("oauth/google: body could not be deserialized: %v", err)
 	}
 
 	return &u, nil

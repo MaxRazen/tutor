@@ -8,6 +8,8 @@ help: ## Show this help
 run: ## Quick build and run
 	go run -ldflags="-X main.mode=devonly" .
 
+test: ## Run golang tests
+	@go test ./internal/utils
 
 build: ## Build a release version
 	@$(MAKE) --no-print-directory clean

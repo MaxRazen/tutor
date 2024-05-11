@@ -5,6 +5,8 @@ type alertType string
 const (
 	AlertSuccess alertType = "success"
 	AlertError   alertType = "error"
+
+	AlertMessageAuthenticationFailed = "User cannot be logged in. Please try again later or contact support"
 )
 
 type Alert struct {
