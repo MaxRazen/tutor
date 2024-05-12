@@ -17,7 +17,7 @@ export default function Callback() {
     if (success) {
         store.setUser(data.user);
         store.setAccessToken(data.accessToken);
-        setTimeout(() => navigate('/'), 20000);
+        setTimeout(() => navigate('/'), 1000);
     }
 
     const backLink = success

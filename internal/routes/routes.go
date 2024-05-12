@@ -9,8 +9,10 @@ import (
 	"github.com/MaxRazen/tutor/internal/auth"
 	"github.com/MaxRazen/tutor/internal/ui"
 	"github.com/MaxRazen/tutor/pkg/oauth"
-	fiber "github.com/gofiber/fiber/v3"
+	fiber "github.com/gofiber/fiber/v2"
 )
+
+type routeHandler fiber.Handler
 
 var spaPaths = [...]string{
 	"/",
@@ -30,8 +32,8 @@ func SetRootTemplate(publicRoot *embed.FS) {
 	rootTemplate = layout
 }
 
-func HomeHandler() func(c fiber.Ctx) error {
-	return func(c fiber.Ctx) error {
+func HomeHandler() routeHandler {
+	return func(c *fiber.Ctx) error {
 		path := string(c.Context().Request.URI().Path())
 
 		if !isPathSupported(path) {
@@ -55,8 +57,8 @@ func isPathSupported(requestedPath string) bool {
 	return false
 }
 
-func AuthRedirect() func(c fiber.Ctx) error {
-	return func(c fiber.Ctx) error {
+func AuthRedirect() routeHandler {
+	return func(c *fiber.Ctx) error {
 		providerName := c.Params("provider", "")
 		if providerName == "" {
 			return c.SendStatus(http.StatusBadRequest)
@@ -71,12 +73,12 @@ func AuthRedirect() func(c fiber.Ctx) error {
 
 		authUrl := provider.BeginAuth("")
 
-		return c.Redirect().To(authUrl)
+		return c.Redirect(authUrl)
 	}
 }
 
-func AuthCallback() func(c fiber.Ctx) error {
-	return func(c fiber.Ctx) error {
+func AuthCallback() routeHandler {
+	return func(c *fiber.Ctx) error {
 		providerName := c.Params("provider", "")
 
 		if providerName == "" {
@@ -124,7 +126,7 @@ func AuthCallback() func(c fiber.Ctx) error {
 	}
 }
 
-func respondWithHtml(c fiber.Ctx, data any) error {
+func respondWithHtml(c *fiber.Ctx, data any) error {
 	c.Context().Response.Header.SetStatusCode(http.StatusOK)
 	c.Context().Response.Header.Add("Content-Type", "text/html")
 

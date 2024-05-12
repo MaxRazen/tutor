@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/gofiber/fiber/v3"
+	fiber "github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -23,7 +23,7 @@ type User struct {
 type Token struct {
 }
 
-var accessTokenTTL time.Duration = time.Minute * 10
+var accessTokenTTL time.Duration = time.Hour * 24
 
 var secretKey []byte = []byte("some_secret_key")
 
