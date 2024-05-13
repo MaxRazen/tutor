@@ -11,18 +11,19 @@ const (
 	GOOGLE_OAUTH_CLIENT_ID    = "GOOGLE_OAUTH_CLIENT_ID"
 	GOOGLE_OAUTH_SECRET       = "GOOGLE_OAUTH_SECRET"
 	GOOGLE_OAUTH_CALLBACK_URL = "GOOGLE_OAUTH_CALLBACK_URL"
+	STORAGE_BUCKET_NAME       = "STORAGE_BUCKET_NAME"
 )
 
 var envVariables map[string]string
 
-func LoadEnv(file embed.FS, name string) {
-	r, err := file.Open(name)
+func LoadEnv(credDir embed.FS, name string) {
+	b, err := credDir.ReadFile(name)
 
 	if err != nil {
-		log.Fatalln("env file cannot be opened:", err.Error())
+		log.Fatalln("env file cannot be read:", err.Error())
 	}
 
-	m, err := godotenv.Parse(r)
+	m, err := godotenv.UnmarshalBytes(b)
 
 	if err != nil {
 		log.Fatalln("env file cannot be parsed:", err.Error())

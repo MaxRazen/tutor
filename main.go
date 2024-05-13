@@ -4,6 +4,7 @@ import (
 	"embed"
 	"os"
 
+	"github.com/MaxRazen/tutor/internal/cloud"
 	"github.com/MaxRazen/tutor/internal/config"
 )
 
@@ -13,13 +14,15 @@ var publicRoot embed.FS
 //go:embed ui/public
 var content embed.FS
 
-//go:embed env
-var envFile embed.FS
+//go:embed credentials
+var credentials embed.FS
 
 var mode string
 
 func main() {
-	config.LoadEnv(envFile, "env")
+	config.LoadEnv(credentials, "credentials/env")
+	cloud.PrepareClient(credentials, "credentials/gcp.json")
+
 	InitOAuthProviders()
 
 	InitServer(config.NewConfig(mode, os.Args[1:]))

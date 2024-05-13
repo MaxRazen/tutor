@@ -12,7 +12,7 @@ import (
 	fiber "github.com/gofiber/fiber/v2"
 )
 
-type routeHandler fiber.Handler
+type routeHandler = fiber.Handler
 
 var spaPaths = [...]string{
 	"/",
