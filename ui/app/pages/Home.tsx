@@ -9,13 +9,13 @@ export default function Home () {
 
             <section className="container py-8">
                 <div className="grid gap-4 grid-cols-3">
-                    <a
-                        href="#"
+                    <Link
+                        to={'/room/1001'}
                         className="block max-w-sm p-6 bg-gray-800 border border-gray-700 rounded-lg shadow hover:bg-gray-700"
                     >
                         <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Call Mode</h5>
                         <p className="font-normal text-gray-400">Try a new call mode with AI assistant as tutor mode</p>
-                    </a>
+                    </Link>
                     <a
                         href="#"
                         className="block max-w-sm p-6 bg-gray-800 border border-gray-700 rounded-lg shadow hover:bg-gray-700"

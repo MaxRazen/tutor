@@ -22,8 +22,9 @@ var mode string
 func main() {
 	config.LoadEnv(credentials, "credentials/env")
 	cloud.PrepareClient(credentials, "credentials/gcp.json")
+	runtimeConfig := config.NewConfig(mode, os.Args[1:])
 
 	InitOAuthProviders()
 
-	InitServer(config.NewConfig(mode, os.Args[1:]))
+	InitServer(runtimeConfig)
 }

@@ -50,6 +50,9 @@ func InitServer(cfg config.RuntimeConfig) {
 	api := server.Group("/api/v1", authMiddleware)
 	api.Post("room", routes.CreateRoomHandler())
 
+	server.Use("/ws", authMiddleware, routes.WebsocketMiddleware())
+	server.Get("/ws/room/:id", routes.RoomWebsocketHandler())
+
 	server.Get("/auth/redirect/:provider", routes.AuthRedirect())
 	server.Get("/auth/callback/:provider", routes.AuthCallback())
 

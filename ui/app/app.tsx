@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom';
 import Home from './pages/Home';
 import About from './pages/About';
+import Room from './pages/Room';
 import AuthLogin from './pages/auth/Login';
 import AuthCallback from './pages/auth/Callback';
 import '../styles/main.scss';
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
     {
         path: 'about',
         element: <About/>,
+    },
+    {
+        path: '/room/:id',
+        element: <Room/>,
     },
     {
         path: '/login',
