@@ -1,8 +1,11 @@
 package cloud
 
 import (
+	"bytes"
 	"context"
 	"embed"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -50,4 +53,21 @@ func SignUrl(objectName string, expires int) string {
 	}
 
 	return url
+}
+
+func Upload(objectName string, content []byte) error {
+	bucket := config.GetEnv(config.STORAGE_BUCKET_NAME, "")
+	r := bytes.NewReader(content)
+
+	ctx := context.Background()
+	wc := client.Bucket(bucket).Object(objectName).NewWriter(ctx)
+
+	if _, err := io.Copy(wc, r); err != nil {
+		log.Println(err.Error())
+		return fmt.Errorf("cloud/storage:copy %v", err)
+	}
+	if err := wc.Close(); err != nil {
+		return fmt.Errorf("cloud/storage:write %v", err)
+	}
+	return nil
 }
