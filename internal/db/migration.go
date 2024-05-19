@@ -11,7 +11,7 @@ type migration struct {
 	down string
 }
 
-func MigrateDB() error {
+func MigrateDB() {
 	log.Println("Migrating DB...")
 
 	migrationTable := migration{
@@ -37,8 +37,11 @@ func MigrateDB() error {
 			name: "create_users_table",
 			up: `CREATE TABLE users (
 				id int unsigned PRIMARY KEY AUTO_INCREMENT,
-				email varchar(128) UNIQUE NOT NULL,
 				name varchar(128) NOT NULL,
+				email varchar(128) UNIQUE NOT NULL,
+				social_id varchar(128) NOT NULL,
+				avatar varchar(255) NOT NULL,
+				last_logged_at timestamp DEFAULT CURRENT_TIMESTAMP,
 				created_at timestamp DEFAULT CURRENT_TIMESTAMP
 			 ) ENGINE=InnoDB`,
 			down: `DROP TABLE IF EXISTS users`,
@@ -48,6 +51,7 @@ func MigrateDB() error {
 			up: `CREATE TABLE rooms (
 				id int unsigned PRIMARY KEY AUTO_INCREMENT,
 				user_id int unsigned NOT NULL,
+				mode enum('call', 'chat') NOT NULL,
 				is_closed bool DEFAULT false NOT NULL ,
 				created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
 				CONSTRAINT FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
@@ -78,8 +82,6 @@ func MigrateDB() error {
 
 		log.Printf("Migration `%s` is applied", m.name)
 	}
-
-	return nil
 }
 
 func isMigrationAppied(name string) bool {

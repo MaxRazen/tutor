@@ -2,9 +2,10 @@ package routes
 
 import (
 	"log"
-	"time"
+	"strconv"
 
 	"github.com/MaxRazen/tutor/internal/cloud"
+	"github.com/MaxRazen/tutor/internal/utils"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 )
@@ -20,6 +21,11 @@ func WebsocketMiddleware() routeHandler {
 	}
 }
 
+type IncomingMessage struct {
+	Type int
+	Body []byte
+}
+
 func RoomWebsocketHandler() routeHandler {
 	return websocket.New(func(c *websocket.Conn) {
 		if c.Locals("allowed") == false {
@@ -31,44 +37,62 @@ func RoomWebsocketHandler() routeHandler {
 		}()
 		// TODO: Fetch Room metadata c.Params("id")
 
-		messages := make(chan []byte)
+		messages := make(chan IncomingMessage)
 		go func() {
 			defer close(messages)
 
 			for {
-				_, msg, err := c.ReadMessage()
+				msgType, msg, err := c.ReadMessage()
+
+				println("received message with type", msgType, len(msg))
 
 				if err != nil {
 					log.Println(err.Error())
 					return
 				}
 
-				messages <- msg
+				input := IncomingMessage{
+					Type: msgType,
+					Body: msg,
+				}
+
+				messages <- input
 			}
 		}()
 
 		for message := range messages {
-			go func(msg []byte) {
-				time.Sleep(time.Second * 1)
+
+			go func(msg IncomingMessage) {
+				if msg.Type != websocket.BinaryMessage {
+					return
+				}
+
+				filename := utils.GenerateRandomString(8) + ".ogg"
+
+				err := cloud.Upload("rooms/1001/"+filename, msg.Body)
+
+				if err != nil {
+					println(err.Error())
+				}
 
 				m := fiber.Map{
 					"type":    "translation",
-					"content": string(msg),
+					"content": "message processed with type: " + strconv.Itoa(msg.Type),
 				}
 				c.WriteJSON(m)
 			}(message)
 
-			go func(msg []byte) {
-				time.Sleep(time.Second * 5)
-				url := cloud.SignUrl("recording.mp3", 60*10)
+			// go func(msg []byte) {
+			// 	time.Sleep(time.Second * 5)
+			// 	url := cloud.SignUrl("recording.mp3", 60*10)
 
-				m := fiber.Map{
-					"type":    "audio",
-					"content": url,
-				}
+			// 	m := fiber.Map{
+			// 		"type":    "audio",
+			// 		"content": url,
+			// 	}
 
-				c.WriteJSON(m)
-			}(message)
+			// 	c.WriteJSON(m)
+			// }(message)
 		}
 	})
 }

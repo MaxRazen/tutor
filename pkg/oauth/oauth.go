@@ -2,8 +2,6 @@ package oauth
 
 import (
 	"fmt"
-
-	"github.com/MaxRazen/tutor/internal/auth"
 )
 
 type ProviderConfig struct {
@@ -15,7 +13,20 @@ type ProviderConfig struct {
 type Provider interface {
 	Name() string
 	BeginAuth(state string) string
-	CompleteAuth(map[string]string) (*auth.User, error)
+	CompleteAuth(map[string]string) (Token, Profile, error)
+}
+
+type Token interface {
+	AccessToken() string
+	RefreshToken() string
+	ExpiresIn() int64
+}
+
+type Profile interface {
+	ID() string
+	Name() string
+	Email() string
+	Avatar() string
 }
 
 type Providers map[string]Provider

@@ -6,9 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/MaxRazen/tutor/internal/auth"
 	"github.com/MaxRazen/tutor/internal/ui"
-	"github.com/MaxRazen/tutor/pkg/oauth"
 	fiber "github.com/gofiber/fiber/v2"
 )
 
@@ -55,75 +53,6 @@ func isPathSupported(requestedPath string) bool {
 		}
 	}
 	return false
-}
-
-func AuthRedirect() routeHandler {
-	return func(c *fiber.Ctx) error {
-		providerName := c.Params("provider", "")
-		if providerName == "" {
-			return c.SendStatus(http.StatusBadRequest)
-		}
-
-		provider, err := oauth.GetProvider(providerName)
-
-		if err != nil {
-			log.Println(err.Error())
-			return c.SendStatus(http.StatusBadRequest)
-		}
-
-		authUrl := provider.BeginAuth("")
-
-		return c.Redirect(authUrl)
-	}
-}
-
-func AuthCallback() routeHandler {
-	return func(c *fiber.Ctx) error {
-		providerName := c.Params("provider", "")
-
-		if providerName == "" {
-			return c.SendStatus(http.StatusNotFound)
-		}
-
-		provider, err := oauth.GetProvider(providerName)
-
-		if err != nil {
-			log.Println(err.Error())
-			return c.SendStatus(http.StatusBadRequest)
-		}
-
-		user, err := provider.CompleteAuth(c.Queries())
-
-		if err != nil {
-			log.Println(err.Error())
-
-			data, _ := ui.WrapWithKey(ui.NewAlert(ui.AlertError, ui.AlertMessageAuthenticationFailed), "alert")
-
-			return respondWithHtml(c, data)
-		}
-
-		// TODO: Save user to DB
-
-		accessToken, err := auth.SignAccessToken(user)
-
-		if err != nil {
-			log.Println(err.Error())
-
-			data, _ := ui.WrapWithKey(ui.NewAlert(ui.AlertError, ui.AlertMessageAuthenticationFailed), "alert")
-
-			return respondWithHtml(c, data)
-		}
-
-		c.Cookie(auth.CreateAccessTokenCookie(accessToken))
-
-		data, err := ui.WrapUserInfo(user, accessToken)
-
-		if err != nil {
-			log.Println(err.Error())
-		}
-
-		return respondWithHtml(c, data)
-	}
 }
 
 func respondWithHtml(c *fiber.Ctx, data any) error {

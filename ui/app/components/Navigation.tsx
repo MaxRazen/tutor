@@ -40,7 +40,7 @@ export default function Navigation() {
                                 className="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-500 md:p-0"
                                 aria-current="page"
                             >
-                                Home
+                                Dashboard
                             </a>
                         </li>
                         <li>

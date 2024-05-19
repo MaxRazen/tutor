@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	APP_KEY                   = "APP_KEY"
 	DB_DSN                    = "DB_DSN"
 	GOOGLE_OAUTH_CLIENT_ID    = "GOOGLE_OAUTH_CLIENT_ID"
 	GOOGLE_OAUTH_SECRET       = "GOOGLE_OAUTH_SECRET"

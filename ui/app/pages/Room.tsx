@@ -1,5 +1,6 @@
 import React from 'react';
 import Navigation from '../components/Navigation';
+import AudioRecorder from '../recorder';
 
 type ReceivePayload = {
     type: 'audio' | 'translation' | 'feedback'
@@ -15,8 +16,12 @@ export default function Room () {
     }
     
     socket.onmessage = (event) => {
-        if (typeof event.data !== 'string') {
-            console.warn('Received unexpected data type in socket connection', typeof event.data);
+        try {
+            const data: ReceivePayload = JSON.parse(event.data);
+        } catch (e) {
+            const msg = 'Received unexpected data type in socket connection';
+            console.warn(msg, typeof event.data);
+            alert(msg);
             return;
         }
 
@@ -35,6 +40,24 @@ export default function Room () {
         socket.send('some-test-str');
     };
 
+    const startRecordingHandler = async () => {
+        recorder.start()
+        console.log('recording started');
+    }
+
+    const stopRecordingHandler = async () => {
+        recorder.stop().then((blob: Blob): void => {
+            console.log('recording finished', typeof blob);
+            const el: HTMLAudioElement|null = document.querySelector('#audio');
+            if (el) {
+                el.src = URL.createObjectURL(blob);
+            }
+            socket.send(blob);
+        })
+    }
+
+    const recorder = new AudioRecorder();
+
     return (
         <main>
             <Navigation/>
@@ -48,9 +71,27 @@ export default function Room () {
                         onClick={onClickHandler}
                     >Init Room</button>
 
-                    <audio id="audio">
-                    </audio>
+                    <hr />
+
+                    <button
+                        className="btn-link"
+                        onClick={startRecordingHandler}
+                    >Start recording</button>
+                    <button
+                        className="btn-link"
+                        onClick={stopRecordingHandler}
+                    >Stop recording</button>
+
+                    <hr />
+
+                    <audio
+                        id="audio"
+                        src=""
+                        controls
+                    ></audio>
                 </div>
+
+
             </section>
         </main>
     )

@@ -6,11 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 
-	"github.com/MaxRazen/tutor/internal/auth"
+	"github.com/MaxRazen/tutor/pkg/oauth"
 	"golang.org/x/oauth2"
 )
 
@@ -34,39 +33,66 @@ func (p *Provider) Client() *http.Client {
 	return p.httpClient
 }
 
-// TODO: beter to call it GetAuthUrl
 func (p *Provider) BeginAuth(state string) string {
 	return p.config.AuthCodeURL(state, p.authCodeOptions...)
 }
 
-func (p *Provider) CompleteAuth(callbackQuery map[string]string) (*auth.User, error) {
+func (p *Provider) CompleteAuth(callbackQuery map[string]string) (oauth.Token, oauth.Profile, error) {
 	code, ok := callbackQuery["code"]
 
 	if !ok {
-		return nil, errors.New("oauth/google: missing required parameter code")
+		return nil, nil, errors.New("oauth/google: missing required parameter code")
 	}
 
-	token, err := p.config.Exchange(context.Background(), code)
+	authToken, err := p.config.Exchange(context.Background(), code)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	if !token.Valid() {
-		return nil, errors.New("oauth/google: invalid token received from 'google'")
+	if !authToken.Valid() {
+		return nil, nil, errors.New("oauth/google: invalid token received from 'google'")
 	}
 
-	u, err := p.fetchUser(token.AccessToken)
+	u, err := p.fetchUser(authToken.AccessToken)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return &auth.User{
-		Name:     u.Name,
-		Email:    u.Email,
-		SocialID: u.ID,
-	}, nil
+	token := Token{
+		accessToken:  authToken.AccessToken,
+		refreshToken: authToken.RefreshToken,
+		expiresIn:    authToken.Expiry.Unix(),
+	}
+
+	profile := Profile{
+		id:     u.ID,
+		name:   u.Name,
+		email:  u.Email,
+		avatar: u.Picture,
+	}
+
+	return &token, &profile, nil
+}
+
+/*
+	{
+		"id": "100000000000000000001",
+		"email": "john.doe@gmail.com",
+		"verified_email": true,
+		"name": "John Doe",
+		"given_name": "John",
+		"family_name": "Doe",
+		"picture": "https://lh3.googleusercontent.com/a/...=s96-c",
+		"locale": "en"
+	}
+*/
+type googleUser struct {
+	ID      string `json:"id"`
+	Email   string `json:"email"`
+	Name    string `json:"name"`
+	Picture string `json:"picture"`
 }
 
 func (p *Provider) fetchUser(accessToken string) (*googleUser, error) {
@@ -88,8 +114,6 @@ func (p *Provider) fetchUser(accessToken string) (*googleUser, error) {
 	if err != nil {
 		return nil, fmt.Errorf("oauth/google: body could not be read: %v", err)
 	}
-
-	log.Println("oauth/google: raw user data", string(body))
 
 	var u googleUser
 	if err = json.Unmarshal(body, &u); err != nil {
@@ -129,14 +153,4 @@ func newConfig(provider *Provider, scopes []string) *oauth2.Config {
 		c.Scopes = []string{"email", "profile"}
 	}
 	return c
-}
-
-type googleUser struct {
-	ID        string `json:"id"`
-	Email     string `json:"email"`
-	Name      string `json:"name"`
-	FirstName string `json:"given_name"`
-	LastName  string `json:"family_name"`
-	Link      string `json:"link"`
-	Picture   string `json:"picture"`
 }

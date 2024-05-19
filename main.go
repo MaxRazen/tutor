@@ -4,6 +4,7 @@ import (
 	"embed"
 	"os"
 
+	"github.com/MaxRazen/tutor/internal/auth"
 	"github.com/MaxRazen/tutor/internal/cloud"
 	"github.com/MaxRazen/tutor/internal/config"
 	"github.com/MaxRazen/tutor/internal/db"
@@ -22,6 +23,7 @@ var mode string
 
 func main() {
 	config.LoadEnv(credentials, "credentials/env")
+	auth.SetSecretKey()
 	db.Connect()
 	db.MigrateDB()
 	cloud.PrepareClient(credentials, "credentials/gcp.json")

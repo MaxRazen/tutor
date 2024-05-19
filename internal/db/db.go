@@ -20,6 +20,8 @@ type QueryArgs struct {
 	Args []any
 }
 
+var ErrNoRows error = sql.ErrNoRows
+
 func (db *DB) IsTableExist(table string) bool {
 	var count int = 0
 
@@ -40,6 +42,23 @@ func (db *DB) First(sql string, args ...any) *sql.Row {
 func (db *DB) Exec(sql string, args ...any) error {
 	_, err := db.conn.Exec(sql, args...)
 	return err
+}
+
+func (db *DB) Transaction(callback func(tx *sql.Tx) error) error {
+	tx, err := db.conn.Begin()
+
+	if err != nil {
+		return err
+	}
+
+	err = callback(tx)
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func Connect() {
