@@ -33,3 +33,9 @@ ui-build:
 clean: ## Clean generated files, logs, caches
 	@rm -rf ui/public/*
 	@rm -rf .dist
+
+.PHONY: init
+init: ## Clean generated files, logs, caches
+	@mkdir ./credentials
+	@cp env.example ./credentials/env
+	@touch ./credentials/gcp.json
