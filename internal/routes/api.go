@@ -14,7 +14,6 @@ import (
 func CreateRoomHandler() routeHandler {
 	return func(c *fiber.Ctx) error {
 		userId := c.Locals("userId").(int)
-		log.Printf("CreateRoomHandler :: %v(%T)", userId, userId)
 
 		user, err := auth.FindUser(userId)
 

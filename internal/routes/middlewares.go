@@ -11,16 +11,14 @@ import (
 )
 
 func AuthMiddleware() routeHandler {
-	protectedPaths := []string{
-		"/",
-		"/about",
-		"/api/v1/room",
+	filteredPaths := []string{
+		"/login",
 	}
 
 	return func(c *fiber.Ctx) error {
 		path := c.Path()
 
-		if !utils.InSlice(path, protectedPaths) {
+		if utils.InSlice(path, filteredPaths) {
 			return c.Next()
 		}
 

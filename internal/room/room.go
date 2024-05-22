@@ -65,7 +65,7 @@ func CreateRoom(data CreationData, u *auth.User) (*Room, error) {
 
 	log.Printf("room: room #%v has been created by user #%v", roomId, u.ID)
 
-	room, err := findRoom(roomId)
+	room, err := FindRoom(roomId, u.ID)
 
 	if err != nil {
 		log.Println(err)
@@ -74,15 +74,15 @@ func CreateRoom(data CreationData, u *auth.User) (*Room, error) {
 	return room, nil
 }
 
-func findRoom(roomId int) (*Room, error) {
+func FindRoom(roomId, relatedUserId int) (*Room, error) {
 	var id int
 	var userId int
 	var mode string
 	var createdAt string
 	var isClosed bool
 
-	sql := `SELECT id, user_id, mode, is_closed, created_at FROM rooms WHERE id = ?`
-	err := db.GetConnection().First(sql, roomId).Scan(&id, &userId, &mode, &isClosed, &createdAt)
+	sql := `SELECT id, user_id, mode, is_closed, created_at FROM rooms WHERE id = ? AND user_id = ?`
+	err := db.GetConnection().First(sql, roomId, relatedUserId).Scan(&id, &userId, &mode, &isClosed, &createdAt)
 
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func findRoom(roomId int) (*Room, error) {
 
 	room := Room{
 		ID:        id,
-		UserId:    int(userId),
+		UserId:    userId,
 		Mode:      mode,
 		CreatedAt: utils.ParseTimestamp(createdAt),
 		IsClosed:  isClosed,

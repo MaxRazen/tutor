@@ -4,7 +4,7 @@ import LogoLink from './LogoLink';
 export default function Navigation() {
     return (
         <nav className="bg-gray-900 border-gray-200">
-            <div className="container flex flex-wrap items-center justify-between py-4">
+            <div className="container flex flex-wrap items-center justify-between py-4 px-4 md:px-0">
                 <div className="space-x-3 rtl:space-x-reverse">
                     <LogoLink/>
                 </div>
@@ -36,7 +36,7 @@ export default function Navigation() {
                     <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-700 rounded-lg bg-gray-800 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-gray-900">
                         <li>
                             <a
-                                href="#"
+                                href="/"
                                 className="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-500 md:p-0"
                                 aria-current="page"
                             >
@@ -44,14 +44,16 @@ export default function Navigation() {
                             </a>
                         </li>
                         <li>
-                            <a
-                                href="#"
+                            <button
+                                type="submit"
+                                form="authLogoutForm"
                                 className="block py-2 px-3 text-white md:hover:text-blue-500 hover:bg-gray-700 hover:text-white md:hover:bg-transparent rounded md:border-0 md:p-0 "
                             >
                                 Logout
-                            </a>
+                            </button>
                         </li>
                     </ul>
+                    <form id="authLogoutForm" action="/auth/logout" method="POST"></form>
                 </div>
             </div>
         </nav>

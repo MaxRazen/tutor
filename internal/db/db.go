@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"log"
+	"time"
 
 	"github.com/MaxRazen/tutor/internal/config"
 	"github.com/MaxRazen/tutor/internal/utils"
@@ -68,6 +69,10 @@ func Connect() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	conn.SetConnMaxLifetime(time.Minute * 3)
+	conn.SetMaxOpenConns(5)
+	conn.SetMaxIdleConns(5)
 
 	if err = conn.Ping(); err != nil {
 		log.Fatalln(err)

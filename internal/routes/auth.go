@@ -76,6 +76,14 @@ func AuthCallback() routeHandler {
 	}
 }
 
+func AuthLogout() routeHandler {
+	return func(c *fiber.Ctx) error {
+		c.Cookie(auth.ExpireAccessTokenCookie())
+
+		return c.Redirect("/login")
+	}
+}
+
 func respondWithAuthError(c *fiber.Ctx, err error, alertMessage ...string) error {
 	log.Println(err.Error())
 

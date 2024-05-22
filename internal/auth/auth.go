@@ -66,6 +66,15 @@ func CreateAccessTokenCookie(accessToken string) *fiber.Cookie {
 	}
 }
 
+func ExpireAccessTokenCookie() *fiber.Cookie {
+	return &fiber.Cookie{
+		Name:    "jwt",
+		Value:   "",
+		Path:    "",
+		Expires: time.Now().Add(-accessTokenTTL),
+	}
+}
+
 func SetSecretKey() {
 	key := config.GetEnv(config.APP_KEY, "")
 	b, err := base64.StdEncoding.DecodeString(key)

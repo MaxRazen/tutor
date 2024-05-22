@@ -1,5 +1,26 @@
 # AI Language Tutor
 
+## Roadmap
+
+- [x] Authorization
+- [x] DB integration
+- [x] Storage integration
+- [x] Websocket room's communication
+- [ ] Call mode
+    - [x] Room creation
+    - [ ] Basic call mode UI
+    - [ ] Voice recording & saving to bucket
+    - [ ] Voice to text transformation
+    - [ ] Text request to GPT model
+    - [ ] Text to voice transformation
+    - [ ] Context configurator
+    - [ ] Call mode extended UI
+- [ ] Chat mode
+    - [ ] Basic chat mode UI
+    - [ ] Text request to GPT model
+- [ ] Text to speech converter
+
+
 ## Build & Development
 
 > **Important**: Please keep in mind the project is built to have only one executable & transferable file. All the assets/credentials are embeded into the binary.

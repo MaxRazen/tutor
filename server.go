@@ -55,6 +55,9 @@ func InitServer(cfg config.RuntimeConfig) {
 
 	server.Get("/auth/redirect/:provider", routes.AuthRedirect())
 	server.Get("/auth/callback/:provider", routes.AuthCallback())
+	server.Post("/auth/logout", routes.AuthLogout())
+
+	server.Get("/room/:id", authMiddleware, routes.ShowRoomHandler())
 
 	server.Get("*", authMiddleware, routes.HomeHandler())
 
