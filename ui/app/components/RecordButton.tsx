@@ -12,7 +12,7 @@ export const RecordButton = () => {
         <div className="flex items-center justify-center">
             <button
                 onClick={toggleRecording}
-                className={`relative w-16 h-16 rounded-full flex items-center justify-center focus:outline-none transition-transform duration-300 ${
+                className={`relative w-16 h-16 rounded-full flex items-center justify-center focus:outline-none transition-transform duration-300 hover:opacity-90 ${
                     isRecording ? 'bg-gradient-to-l from-red-500 to-orange-500' : 'bg-gradient-to-r from-cyan-500 to-blue-500'
                 }`}
             >
