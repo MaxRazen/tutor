@@ -1,73 +1,89 @@
-export default class AudioRecorder {
-        audioBlobs: Blob[]
+export type RecordingResult = {
+    duration: number
+    audio: Blob
+}
 
-        mediaRecorder: MediaRecorder | null
+export class AudioRecorder {
+    startTime: Date
 
-        streamBeingCaptured: MediaStream | null
+    audioBlobs: Blob[]
 
-        public async start(): Promise<MediaStream | void> {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                throw new Error('mediaDevices API or getUserMedia method is not supported in this browser.');
-            }
-    
-            return navigator.mediaDevices.getUserMedia({ audio: true })
-                .then((stream: MediaStream) => {
-                    //save the reference of the stream to be able to stop it when necessary
-                    this.streamBeingCaptured = stream;
+    mediaRecorder: MediaRecorder | null
 
-                    this.mediaRecorder = new MediaRecorder(stream);
+    streamBeingCaptured: MediaStream | null
 
-                    this.audioBlobs = [];
+    public getDuration(): number {
+        return (new Date()).getTime() - this.startTime.getTime()
+    }
 
-                    this.mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
-                        this.audioBlobs.push(event.data);
-                    });
-
-                    this.mediaRecorder.start();
-                });
+    public async start(): Promise<MediaStream | void> {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error('mediaDevices API or getUserMedia method is not supported in this browser.');
         }
 
-        public stop(): Promise<Blob> {
-            return new Promise(resolve => {
-                if (!this.mediaRecorder) {
-                    return;
-                }
+        return navigator.mediaDevices.getUserMedia({ audio: true })
+            .then((stream: MediaStream) => {
+                this.streamBeingCaptured = stream;
 
-                const mimeType = this.mediaRecorder.mimeType;    
+                this.mediaRecorder = new MediaRecorder(stream);
 
-                this.mediaRecorder.addEventListener('stop', () => {
-                    const audioBlob = new Blob(this.audioBlobs, { type: mimeType });
-                    resolve(audioBlob);
+                this.audioBlobs = [];
+
+                this.mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
+                    this.audioBlobs.push(event.data);
                 });
 
-                this.cancel();
+                this.mediaRecorder.start();
+                this.startTime = new Date();
             });
-        }
+    }
 
-        public cancel() {
+    public stop(): Promise<RecordingResult> {
+        return new Promise(resolve => {
             if (!this.mediaRecorder) {
                 return;
             }
 
-            this.mediaRecorder.stop();
-    
-            this.stopStream();
-    
-            this.resetRecordingProperties();
+            const mimeType = this.mediaRecorder.mimeType;    
+
+            this.mediaRecorder.addEventListener('stop', () => {
+                const audio = new Blob(this.audioBlobs, { type: mimeType });
+                const duration: number = this.getDuration();
+
+                resolve({
+                    duration,
+                    audio,
+                });
+            });
+
+            this.cancel();
+        });
+    }
+
+    public cancel() {
+        if (!this.mediaRecorder) {
+            return;
         }
 
-        public stopStream() {
-            if (!this.streamBeingCaptured) {
-                return;
-            }
+        this.mediaRecorder.stop();
 
-            this.streamBeingCaptured
-                .getTracks()
-                .forEach((track: MediaStreamTrack) => track.stop()); //stop each one
+        this.stopStream();
+
+        this.resetRecordingProperties();
+    }
+
+    public stopStream() {
+        if (!this.streamBeingCaptured) {
+            return;
         }
 
-        public resetRecordingProperties() {
-            this.mediaRecorder = null;
-            this.streamBeingCaptured = null;
-        }
+        this.streamBeingCaptured
+            .getTracks()
+            .forEach((track: MediaStreamTrack) => track.stop());
+    }
+
+    public resetRecordingProperties() {
+        this.mediaRecorder = null;
+        this.streamBeingCaptured = null;
+    }
 }

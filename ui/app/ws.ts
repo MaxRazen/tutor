@@ -3,7 +3,7 @@ type messageHandler = (e: MessageEvent<any>) => void;
 type closeHandler = (e: CloseEvent) => void;
 type genericHandler = eventHandler | messageHandler | closeHandler;
 
-export class WSConnection {
+export default class WSConnection {
     private conn: WebSocket;
     private onOpenSubscribers: eventHandler[] = [];
     private onErrorSubscribers: eventHandler[] = [];
