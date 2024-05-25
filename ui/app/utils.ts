@@ -6,9 +6,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatTimeDuration(durationMs: number): string {
-    const mins = +(durationMs / 1000 / 60).toFixed();
+    const mins = Math.floor(durationMs / 1000 / 60);
     const minToken = mins > 0 ? mins.toString() : '0';
-    const seconds = Math.round(60 * (durationMs / 1000 / 60 - mins));
+    const seconds = Math.ceil(60 * (durationMs / 1000 / 60 - mins));
     const secToken = (seconds < 10 ? '0' : '') + seconds.toFixed();
 
     return `${minToken}:${secToken}`;

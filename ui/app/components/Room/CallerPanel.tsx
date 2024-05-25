@@ -67,7 +67,7 @@ export default function CallerPanel(props: CallerPanelProps) {
                     containerClassName="w-full h-full rounded-[16px] p-4"
                     interactive={false}
                 >
-                    <div className="flex flex-col" style={{minHeight: '70vh'}}>
+                    <div className="flex flex-col min-h-[65vh]">
                         <div className="flex-grow h-full flex flex-col items-center justify-center text-white font-bold px-4 pointer-events-none text-lg text-center md:text-xl lg:text-2xl">
                             <div className="border-2 border-white rounded-full p-0.5 mb-4">
                                 <img

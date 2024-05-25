@@ -16,7 +16,7 @@ export default function Room () {
     const navigate = useNavigate();
 
     // Toolbar
-    const [historyShown, setHistoryShown] = useState(false);
+    const [historyShown, setHistoryShown] = useState(true);
     const toolbarHandlers= {
         leaveRoom() {            
             wsConn.disconnect();
@@ -57,11 +57,13 @@ export default function Room () {
                     wsConnection={wsConn}
                 ></CallerPanel>
 
-                {
-                    historyShown && (
-                        <HistoryPanel></HistoryPanel>
-                    )
-                }
+                <div
+                    className={`md:w-2/3 h-auto ${!historyShown ? 'hidden' : ''}`}
+                >
+                    <HistoryPanel
+                        wsConnection={wsConn}
+                    ></HistoryPanel>
+                </div>
             </section>
         </main>
     )

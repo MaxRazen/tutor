@@ -13,3 +13,11 @@ body {
 .btn-link {
     @apply w-full p-4 border border-gray-700 rounded-lg flex items-center justify-center hover:border-gray-600 hover:bg-gray-700;
 }
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        width: 0;
+    }
+}
