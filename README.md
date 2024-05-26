@@ -8,7 +8,7 @@
 - [x] Websocket room's communication
 - [ ] Call mode
     - [x] Room creation
-    - [ ] Basic call mode UI
+    - [x] Basic call mode UI
     - [ ] Voice recording & saving to bucket
     - [ ] Voice to text transformation
     - [ ] Text request to GPT model

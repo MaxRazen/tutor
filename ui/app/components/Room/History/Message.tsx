@@ -21,7 +21,7 @@ export function Message(props: MessageProps) {
                 src={msg.avatar}
                 alt={msg.name}
             />
-            <div className="flex flex-col w-full max-w-[320px] leading-1.5">
+            <div className="flex flex-col w-full max-w-full md:max-w-[320px] leading-1.5 overflow-hidden">
                 <div className="flex items-center space-x-2 rtl:space-x-reverse">
                     <span className="text-sm font-semibold :text-white">
                         {msg.name}

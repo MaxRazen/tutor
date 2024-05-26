@@ -55,6 +55,10 @@ export default class WSConnection {
         this.conn.close();
     }
 
+    public send(msg: string | Blob): void {
+        this.conn.send(msg);
+    }
+
     private safeCall(handler: genericHandler, arg: any) {
         try {
             handler(arg);

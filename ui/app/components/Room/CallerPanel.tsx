@@ -51,23 +51,24 @@ export default function CallerPanel(props: CallerPanelProps) {
             setIsRecordingDisabled(true);
 
             console.log('stopVoiceRecoring', typeof result.audio, result.audio.type, result.audio.size);
-            // socket.send(blob);
+            props.wsConnection.send(result.audio);
             setTimeout(() => setIsRecordingDisabled(false), 1000);
         })
     }
 
     return (
         <GradientBorderCard
-            containerClassName={`w-full md:w-1/3 md:mx-auto h-full ${!props.historyShown && 'md:mx-auto'}`}
-            className="h-full rounded-[22px] p-2 bg-zinc-900"
+            containerClassName="w-full h-auto md:w-1/3 md:mx-auto"
+            className="w-full h-full rounded-[22px] p-2 bg-zinc-900 min-h-[65vh] md:min-h-auto"
             animate={false}
         >
-            <div>
-                <BackgroundGradientAnimation
-                    containerClassName="w-full h-full rounded-[16px] p-4"
-                    interactive={false}
-                >
-                    <div className="flex flex-col min-h-[65vh]">
+            <BackgroundGradientAnimation
+                containerClassName="w-full h-full rounded-[16px]"
+                className="w-full h-full"
+                interactive={false}
+            >
+                <div className="relative min-h-[65vh] md:min-h-auto">
+                    <div className="absolute w-full h-full flex flex-col p-4 z-10">
                         <div className="flex-grow h-full flex flex-col items-center justify-center text-white font-bold px-4 pointer-events-none text-lg text-center md:text-xl lg:text-2xl">
                             <div className="border-2 border-white rounded-full p-0.5 mb-4">
                                 <img
@@ -94,11 +95,11 @@ export default function CallerPanel(props: CallerPanelProps) {
                                     disabled={isRecordingDisabled}
                                     onRecordingToggle={onRecordingToggle}
                                 ></RecordButton>
-                            </div>                                    
+                            </div>
                         </div>
                     </div>
-                </BackgroundGradientAnimation>
-            </div>
+                </div>
+            </BackgroundGradientAnimation>
         </GradientBorderCard>
     )
 }

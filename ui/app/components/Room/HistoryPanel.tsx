@@ -51,19 +51,20 @@ export default function HistoryPanel(props: HistoryPanelProps) {
     return (
         <GradientBorderCard
             containerClassName="w-full h-full"
-            className="h-full rounded-[22px] p-4 md:p-8 bg-gray-900 overflow-hidden overflow-y-auto no-scrollbar max-h-[70vh]"
+            className="w-full h-full flex flex-col rounded-[22px] px-4 md:px-8 bg-gray-900 overflow-hidden"
             animate={false}
         >
-            <div className='flex flex-col gap-4 md:gap-8'>
-                {
-                    messages.map((message, i) => (
-                        <Message
-                            key={i}
-                            context={message}
-                        ></Message>
-                    ))
-                }
-                
+            <div className="flex-grow overflow-y-auto no-scrollbar py-4 md:py-8 max-h-[65vh] md:max-h-max">
+                <div className="flex flex-col gap-4 md:gap-8">
+                    {
+                        messages.map((message, i) => (
+                            <Message
+                                key={i}
+                                context={message}
+                            ></Message>
+                        ))
+                    }
+                </div>
             </div>
         </GradientBorderCard>
     )

@@ -18,7 +18,7 @@ export default function Room () {
     // Toolbar
     const [historyShown, setHistoryShown] = useState(true);
     const toolbarHandlers= {
-        leaveRoom() {            
+        leaveRoom() {
             wsConn.disconnect();
             navigate('/');
         },
@@ -51,7 +51,7 @@ export default function Room () {
                 ></Toolbar>
             </section>
 
-            <section className="container py-8 flex flex-col md:flex-row gap-8 md:gap-16 px-8 md:px-0">
+            <section className="container py-8 flex flex-col md:flex-row gap-8 md:gap-16 px-8 md:px-0 md:h-[75vh]">
                 <CallerPanel
                     historyShown={historyShown}
                     wsConnection={wsConn}
