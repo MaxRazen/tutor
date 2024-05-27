@@ -24,9 +24,9 @@ func NewTemplateData(data any) (TemplateData, error) {
 }
 
 type userInfo struct {
-	User        *auth.User `json:"user"`
-	AccessToken string     `json:"accessToken"`
-	Authorized  bool       `json:"authorized"`
+	User        auth.PublicUser `json:"user"`
+	AccessToken string          `json:"accessToken"`
+	Authorized  bool            `json:"authorized"`
 }
 
 func WrapWithKey(data any, key string) (TemplateData, error) {
@@ -36,7 +36,7 @@ func WrapWithKey(data any, key string) (TemplateData, error) {
 	return NewTemplateData(m)
 }
 
-func WrapUserInfo(u *auth.User, t string) (TemplateData, error) {
+func WrapUserInfo(u auth.PublicUser, t string) (TemplateData, error) {
 	data := userInfo{
 		User:        u,
 		AccessToken: t,

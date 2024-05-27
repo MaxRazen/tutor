@@ -10,6 +10,15 @@ declare global {
     }
 }
 
+type User = {
+    id: number
+    name: string
+    email: string
+    avatar: string
+    socialId: string
+    lastLoggedAt: string
+};
+
 class Application {
     private config: AppConfig;
    
@@ -47,5 +56,8 @@ class Application {
 }
 
 const app = new Application(window.AppConfig);
+
+export const TUTOR_AVATAR = 'https://res.cloudinary.com/dzgusx2vf/image/upload/v1716310225/tutor/avatar-scarlett.jpg';
+export const TUTOR_NAME = 'Scarlett';
 
 export default app;

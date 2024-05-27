@@ -17,6 +17,7 @@
     "node": ">=18.17.0 <= 20.x"
   },
   "dependencies": {
+    "@heroicons/react": "^2.1.3",
     "clsx": "^2.1.1",
     "framer-motion": "^11.2.5",
     "react": "^18.3.1",

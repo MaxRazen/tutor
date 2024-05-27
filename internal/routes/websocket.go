@@ -4,8 +4,7 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/MaxRazen/tutor/internal/cloud"
-	"github.com/MaxRazen/tutor/internal/utils"
+	"github.com/MaxRazen/tutor/internal/room"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 )
@@ -21,7 +20,7 @@ func WebsocketMiddleware() routeHandler {
 	}
 }
 
-type IncomingMessage struct {
+type incomingMessage struct {
 	Type int
 	Body []byte
 }
@@ -32,12 +31,22 @@ func RoomWebsocketHandler() routeHandler {
 			c.Close()
 			return
 		}
+
+		roomId, err := strconv.Atoi(c.Params("id"))
+
+		if err != nil {
+			log.Println("ws: roomId can not be parsed", roomId)
+			// TODO: write msg to client
+			c.Close()
+			return
+		}
+
 		defer func() {
 			println("connection per room", c.Params("id"), "is closed")
 		}()
 		// TODO: Fetch Room metadata c.Params("id")
 
-		messages := make(chan IncomingMessage)
+		messages := make(chan incomingMessage)
 		go func() {
 			defer close(messages)
 
@@ -51,7 +60,7 @@ func RoomWebsocketHandler() routeHandler {
 					return
 				}
 
-				input := IncomingMessage{
+				input := incomingMessage{
 					Type: msgType,
 					Body: msg,
 				}
@@ -60,27 +69,17 @@ func RoomWebsocketHandler() routeHandler {
 			}
 		}()
 
+		msgWriter := func(data []byte) {
+			c.WriteMessage(websocket.TextMessage, data)
+		}
+
 		for message := range messages {
 
-			go func(msg IncomingMessage) {
-				if msg.Type != websocket.BinaryMessage {
-					return
-				}
-
-				filename := utils.GenerateRandomString(8) + ".ogg"
-
-				err := cloud.Upload("rooms/1001/"+filename, msg.Body)
-
-				if err != nil {
-					println(err.Error())
-				}
-
-				m := fiber.Map{
-					"type":    "translation",
-					"content": "message processed with type: " + strconv.Itoa(msg.Type),
-				}
-				c.WriteJSON(m)
-			}(message)
+			if message.Type == websocket.BinaryMessage {
+				// save recording in asynchronously
+				// TODO: add context
+				go room.AcceptVoiceCommand(roomId, message.Body, msgWriter)
+			}
 
 			// go func(msg []byte) {
 			// 	time.Sleep(time.Second * 5)

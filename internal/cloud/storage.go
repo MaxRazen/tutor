@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -61,6 +62,7 @@ func Upload(objectName string, content []byte) error {
 
 	ctx := context.Background()
 	wc := client.Bucket(bucket).Object(objectName).NewWriter(ctx)
+	wc.ObjectAttrs.ContentType = resolveContentType(objectName)
 
 	if _, err := io.Copy(wc, r); err != nil {
 		log.Println(err.Error())
@@ -70,4 +72,11 @@ func Upload(objectName string, content []byte) error {
 		return fmt.Errorf("cloud/storage:write %v", err)
 	}
 	return nil
+}
+
+func resolveContentType(filename string) string {
+	if strings.HasSuffix(filename, ".ogg") {
+		return "audio/ogg"
+	}
+	return ""
 }

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, Ref } from 'react';
-import PauseIcon from '../../Icons/PauseIcon';
-import PlayIcon from '../../Icons/PlayIcon';
+import { PlayIcon, PauseIcon } from '@heroicons/react/24/solid';
 import { formatTimeDuration } from '../../../utils';
 
 export default function AudioTrack({ source }: { source: string }) {
@@ -24,10 +23,20 @@ export default function AudioTrack({ source }: { source: string }) {
     }
 
     useEffect(() => {
-        audioEl.current?.addEventListener('loadedmetadata', (event) => {
-            if (audioEl.current?.duration) {
-                setDuration(formatTimeDuration(audioEl.current.duration * 1000));
+        if (!audioEl.current) {
+            return
+        }
+        const el: HTMLAudioElement = audioEl.current;
+
+        el.addEventListener('durationchange', () => {
+            const duration = el.duration;
+
+            if (Number.isFinite(duration)) {
+                setDuration(formatTimeDuration(duration * 1000));
             }
+        })
+        el.addEventListener('ended', () => {
+            setPlaying(false);
         })
     })
 
@@ -44,8 +53,8 @@ export default function AudioTrack({ source }: { source: string }) {
             >
                 {
                     playing
-                    ? <PauseIcon/>
-                    : <PlayIcon />
+                    ? <PauseIcon className="size-4"/>
+                    : <PlayIcon className="size-4"/>
                 }
             </button>
             <svg

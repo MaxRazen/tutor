@@ -66,7 +66,7 @@ func AuthCallback() routeHandler {
 
 		c.Cookie(auth.CreateAccessTokenCookie(accessToken))
 
-		data, err := ui.WrapUserInfo(user, accessToken)
+		data, err := ui.WrapUserInfo(user.Convert2PublicUser(), accessToken)
 
 		if err != nil {
 			log.Println(err.Error())

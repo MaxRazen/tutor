@@ -5,6 +5,12 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
+export function formatTime(dt: Date): string {
+    const h = dt.getHours();
+    const m = dt.getMinutes();
+    return `${h}:${m}`;
+}
+
 export function formatTimeDuration(durationMs: number): string {
     const mins = Math.floor(durationMs / 1000 / 60);
     const minToken = mins > 0 ? mins.toString() : '0';

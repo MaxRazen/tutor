@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import MicIcon from './Icons/MicIcon';
+import { MicrophoneIcon } from '@heroicons/react/24/outline';
 
 export type RecordButtonProps = {
     disabled: boolean
@@ -23,9 +23,9 @@ export default function RecordButton(props: RecordButtonProps) {
                     isRecording ? 'bg-gradient-to-l from-red-500 to-orange-500' : 'bg-gradient-to-r from-cyan-500 to-blue-600'
                 } ${props.disabled ? 'opacity-60 pointer-events-none' : ''}`}
             >
-                <MicIcon className={`w-8 h-8 transition-transform duration-300 text-white ${
+                <MicrophoneIcon className={`w-8 h-8 transition-transform duration-300 text-white ${
                     isRecording ? 'animate-pulse' : ''
-                }`}></MicIcon>
+                }`}></MicrophoneIcon>
 
                 <div
                     className={`absolute w-16 h-16 rounded-full bg-red-500 opacity-50 animate-ping ${

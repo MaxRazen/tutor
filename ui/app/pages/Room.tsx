@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useParams, useNavigate} from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Toolbar from '../components/Room/Toolbar';
@@ -38,7 +38,12 @@ export default function Room () {
     wsConn.onConnect((e) => {
         console.log('Connected to WS | Room:', roomId);
     });
-    //wsConn.connect();
+
+    useEffect(() => {
+        wsConn.connect();
+
+        return () => wsConn.disconnect()
+    })
 
     return (
         <main>

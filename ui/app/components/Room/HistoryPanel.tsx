@@ -3,58 +3,72 @@ import { GradientBorderCard } from '../GradientBorderCard';
 import { Message, MessageContext } from './History/Message';
 import AudioTrack from './History/AudioTrack';
 import WSConnection from '../../ws';
+import {TUTOR_NAME, TUTOR_AVATAR} from '../../Application';
+import store from '../../store';
+import {formatTime} from '../../utils';
 
 type HistoryPanelProps = {
     wsConnection: WSConnection
 }
 
-export default function HistoryPanel(props: HistoryPanelProps) {
-    const [messages, setMessages] = useState<MessageContext[]>([
-        {
-            avatar: 'https://res.cloudinary.com/dzgusx2vf/image/upload/v1716310225/tutor/avatar-scarlett.jpg',
-            name: 'Scarlett',
-            align: 'right',
-            message: <AudioTrack source='/assets/FirstSnow-Emancipator.mp3'/>,
-        },
-        {
-            avatar: 'https://res.cloudinary.com/dzgusx2vf/image/upload/v1716310225/tutor/avatar-scarlett.jpg',
-            name: 'John',
-            align: 'left',
-            message: <AudioTrack source='/assets/Anthem-Emancipator.mp3'/>,
-        },
-        {
-            avatar: 'https://res.cloudinary.com/dzgusx2vf/image/upload/v1716310225/tutor/avatar-scarlett.jpg',
-            name: 'Scarlett',
-            align: 'right',
-            message: 'In this example, the ChatRoom component uses an Effect to stay connected to an external system defined in chat.js. '
-                +'Press “Open chat” to make the ChatRoom component appear. '
-                +'This sandbox runs in development mode, so there is an extra connect-and-disconnect cycle, as explained here.'
-                +'Try changing the roomId and serverUrl using the dropdown and the input, and see how the Effect re-connects to the chat.'
-                +'Press “Close chat” to see the Effect disconnect one last time.',
-        },
-        {
-            avatar: 'https://res.cloudinary.com/dzgusx2vf/image/upload/v1716310225/tutor/avatar-scarlett.jpg',
-            name: 'Scarlett',
-            align: 'right',
-            message: 'In this example, the ChatRoom component uses an Effect to stay connected to an external system defined in chat.js. '
-                +'Press “Open chat” to make the ChatRoom component appear. '
-                +'This sandbox runs in development mode, so there is an extra connect-and-disconnect cycle, as explained here.'
-                +'Try changing the roomId and serverUrl using the dropdown and the input, and see how the Effect re-connects to the chat.'
-                +'Press “Close chat” to see the Effect disconnect one last time.',
-        },
-    ]);
+type ResponseMessage = {
+    type: "recording" | "error"
+	ts: number
+	authorship: "user" | "tutor" | "system"
+ 	content: string
+    transcription: string
+}
 
-    props.wsConnection.onMessage(() => {
-        // TODO: load messages
+const messageFactory = (msg: ResponseMessage): MessageContext => {
+    const user = store.getUser();
+    let name: string = TUTOR_NAME;
+    let avatar: string = TUTOR_AVATAR;
+    const time = formatTime(new Date(msg.ts * 1000));
+
+    if (msg.authorship === 'user' && user) {
+        name = user.name;
+        avatar = user.avatar;
+    }
+
+    let message: string | React.JSX.Element = '';
+    switch (msg.type) {
+        case 'recording':
+            message = <AudioTrack source={msg.content}/>
+            break;
+        default:
+            message = msg.content;
+    }
+
+    return {
+        avatar,
+        name,
+        time,
+        message,
+        transcription: msg.transcription,
+    }
+}
+
+export default function HistoryPanel(props: HistoryPanelProps) {
+    const [messages, setMessages] = useState<MessageContext[]>([]);
+
+    props.wsConnection.onMessage((e: MessageEvent) => {
+        console.log('HistoryPanel :: onMessage');
+        console.log(e.data, typeof e.data);
+        const msg: ResponseMessage = JSON.parse(e.data);
+
+        setMessages([
+            ...messages,
+            messageFactory(msg),
+        ]);
     })
 
     return (
         <GradientBorderCard
             containerClassName="w-full h-full"
-            className="w-full h-full flex flex-col rounded-[22px] px-4 md:px-8 bg-gray-900 overflow-hidden"
+            className="w-full h-full flex flex-col rounded-[22px] px-2 md:px-6 bg-gray-900 overflow-hidden"
             animate={false}
         >
-            <div className="flex-grow overflow-y-auto no-scrollbar py-4 md:py-8 max-h-[65vh] md:max-h-max">
+            <div className="flex-grow overflow-y-auto no-scrollbar py-2 md:py-6 max-h-[65vh] md:max-h-max">
                 <div className="flex flex-col gap-4 md:gap-8">
                     {
                         messages.map((message, i) => (

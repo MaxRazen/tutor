@@ -9,7 +9,7 @@
 - [ ] Call mode
     - [x] Room creation
     - [x] Basic call mode UI
-    - [ ] Voice recording & saving to bucket
+    - [x] Voice recording & saving to bucket
     - [ ] Voice to text transformation
     - [ ] Text request to GPT model
     - [ ] Text to voice transformation

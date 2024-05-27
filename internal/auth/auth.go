@@ -14,15 +14,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type User struct {
-	ID           int
-	Name         string
-	Email        string
-	Avatar       string
-	SocialID     string
-	LastLoggedAt time.Time
-}
-
 var accessTokenTTL time.Duration = time.Hour * 24
 
 var secretKey []byte
