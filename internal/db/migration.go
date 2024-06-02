@@ -59,6 +59,19 @@ func MigrateDB() {
 			down: `DROP TABLE IF EXISTS rooms`,
 		},
 		{
+			name: "create_room_history_table",
+			up: `CREATE TABLE room_history (
+				id int PRIMARY KEY AUTO_INCREMENT,
+				room_id int unsigned NOT NULL,
+				authorship enum('user', 'system', 'assistant') NOT NULL,
+				transcription text NOT NULL,
+				recording varchar(255),
+				created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+				CONSTRAINT FOREIGN KEY (room_id) REFERENCES rooms (id) ON DELETE CASCADE
+			  )`,
+			down: `DROP TABLE IF EXISTS room_history`,
+		},
+		{
 			name: "create_room_stats_table",
 			up: `CREATE TABLE room_stats (
 				id int unsigned PRIMARY KEY AUTO_INCREMENT,

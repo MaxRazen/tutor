@@ -56,6 +56,12 @@ func SignUrl(objectName string, expires int) string {
 	return url
 }
 
+func GetObjectReader(ctx context.Context, objectName string) (*storage.Reader, error) {
+	bucket := config.GetEnv(config.STORAGE_BUCKET_NAME, "")
+
+	return client.Bucket(bucket).Object(objectName).NewReader(ctx)
+}
+
 func Upload(objectName string, content []byte) error {
 	bucket := config.GetEnv(config.STORAGE_BUCKET_NAME, "")
 	r := bytes.NewReader(content)

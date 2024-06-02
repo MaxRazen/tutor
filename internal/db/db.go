@@ -40,6 +40,10 @@ func (db *DB) First(sql string, args ...any) *sql.Row {
 	return db.conn.QueryRow(sql, args...)
 }
 
+func (db *DB) Get(sql string, args ...any) (*sql.Rows, error) {
+	return db.conn.Query(sql, args...)
+}
+
 func (db *DB) Exec(sql string, args ...any) error {
 	_, err := db.conn.Exec(sql, args...)
 	return err
