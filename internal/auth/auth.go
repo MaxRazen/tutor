@@ -101,7 +101,7 @@ func FindUser(userId int) (*User, error) {
 		Email:        email,
 		Avatar:       avatar,
 		SocialID:     socialId,
-		LastLoggedAt: utils.ParseTimestamp(lastLoggedAt),
+		LastLoggedAt: utils.ParseDatetime(lastLoggedAt),
 	}
 	return &u, nil
 }
@@ -133,7 +133,7 @@ func FindOrCreateUser(p oauth.Profile) (*User, error) {
 		Email:        email,
 		Avatar:       avatar,
 		SocialID:     socialId,
-		LastLoggedAt: utils.ParseTimestamp(lastLoggedAt),
+		LastLoggedAt: utils.ParseDatetime(lastLoggedAt),
 	}
 
 	return &u, nil

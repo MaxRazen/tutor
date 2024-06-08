@@ -13,6 +13,7 @@
     - [ ] Voice to text transformation
     - [ ] Text request to GPT model
     - [ ] Text to voice transformation
+    - [ ] Room history extraction
     - [ ] Context configurator
     - [ ] Call mode extended UI
 - [ ] Chat mode

@@ -36,34 +36,37 @@ func PrepareClient(credDir embed.FS, name string) {
 	client = c
 }
 
+func GetBucket() *storage.BucketHandle {
+	bucket := getBucketName()
+	return client.Bucket(bucket)
+}
+
 // Generates a signed URL that public accessable
 // Specify object name on the bucket and expires in seconds
 func SignUrl(objectName string, expires int) string {
-	bucket := config.GetEnv(config.STORAGE_BUCKET_NAME, "")
+	bucket := getBucketName()
 	options := storage.SignedURLOptions{
 		Method:  http.MethodGet,
 		Expires: time.Now().Add(time.Second * time.Duration(expires)),
 	}
 
-	url, err := client.
-		Bucket(bucket).
-		SignedURL(objectName, &options)
+	url, err := client.Bucket(bucket).SignedURL(objectName, &options)
 
 	if err != nil {
-		log.Println(err.Error())
+		log.Println("gcp/sign-url:", err)
 	}
 
 	return url
 }
 
 func GetObjectReader(ctx context.Context, objectName string) (*storage.Reader, error) {
-	bucket := config.GetEnv(config.STORAGE_BUCKET_NAME, "")
+	bucket := getBucketName()
 
 	return client.Bucket(bucket).Object(objectName).NewReader(ctx)
 }
 
 func Upload(objectName string, content []byte) error {
-	bucket := config.GetEnv(config.STORAGE_BUCKET_NAME, "")
+	bucket := getBucketName()
 	r := bytes.NewReader(content)
 
 	ctx := context.Background()
@@ -85,4 +88,8 @@ func resolveContentType(filename string) string {
 		return "audio/ogg"
 	}
 	return ""
+}
+
+func getBucketName() string {
+	return config.GetEnv(config.STORAGE_BUCKET_NAME, "")
 }

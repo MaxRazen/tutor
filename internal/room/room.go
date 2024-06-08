@@ -92,7 +92,7 @@ func FindRoom(roomId, relatedUserId int) (*Room, error) {
 		ID:        id,
 		UserId:    userId,
 		Mode:      mode,
-		CreatedAt: utils.ParseTimestamp(createdAt),
+		CreatedAt: utils.ParseDatetime(createdAt),
 		IsClosed:  isClosed,
 	}
 

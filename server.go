@@ -48,7 +48,7 @@ func InitServer(cfg config.RuntimeConfig) {
 	server.Use("/assets", filesystem.New(filesystemConfig))
 
 	api := server.Group("/api/v1", authMiddleware)
-	api.Post("room", routes.CreateRoomHandler())
+	api.Post("room", routes.RoomCreateHandler())
 
 	server.Use("/ws", authMiddleware, routes.WebsocketMiddleware())
 	server.Get("/ws/room/:id", routes.RoomWebsocketHandler())
@@ -57,7 +57,7 @@ func InitServer(cfg config.RuntimeConfig) {
 	server.Get("/auth/callback/:provider", routes.AuthCallback())
 	server.Post("/auth/logout", routes.AuthLogout())
 
-	server.Get("/room/:id", authMiddleware, routes.ShowRoomHandler())
+	server.Get("/room/:id", authMiddleware, routes.RoomShowHandler())
 
 	server.Get("*", authMiddleware, routes.HomeHandler())
 

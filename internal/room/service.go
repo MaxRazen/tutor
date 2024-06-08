@@ -10,12 +10,14 @@ import (
 	"github.com/MaxRazen/tutor/internal/cloud"
 	"github.com/MaxRazen/tutor/internal/openai"
 	"github.com/MaxRazen/tutor/internal/utils"
+	"github.com/MaxRazen/tutor/pkg/memcache"
 )
 
 const (
 	RecordingLinkTTL      = 3600
 	ResponseTypeRecording = "recording"
 	ResponseTypeError     = "error"
+	RecordingCachePrefix  = "audio:"
 )
 
 type response struct {
@@ -28,18 +30,33 @@ type response struct {
 
 type wsWriter func(data []byte)
 
+func GetPublicAudioLink(audio string) string {
+	link, ok := memcache.Get(RecordingCachePrefix + audio)
+
+	if !ok {
+		link := cloud.SignUrl(audio, RecordingLinkTTL)
+		key := RecordingCachePrefix + audio
+
+		memcache.Set(key, link, time.Second*RecordingLinkTTL)
+		return link
+	}
+
+	return link
+}
+
 func AcceptVoiceCommand(roomId int, audio []byte, writer wsWriter) {
-	rh, err := processUserVoiceCommand(roomId, audio, writer)
+	_, err := processUserVoiceCommand(roomId, audio, writer)
 
 	if err != nil {
 		return
 	}
 
-	_, err = generateAssistantVoiceResponse(roomId, rh.Transcription, writer)
+	// TODO: uncomment
+	// _, err = generateAssistantVoiceResponse(roomId, rh.Transcription, writer)
 
-	if err != nil {
-		return
-	}
+	// if err != nil {
+	// 	return
+	// }
 
 	log.Printf("User voice command accepted and processed successfully: room #%v", roomId)
 }

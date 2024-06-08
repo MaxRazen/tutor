@@ -8,6 +8,7 @@ import (
 	"github.com/MaxRazen/tutor/internal/cloud"
 	"github.com/MaxRazen/tutor/internal/config"
 	"github.com/MaxRazen/tutor/internal/db"
+	"github.com/MaxRazen/tutor/pkg/memcache"
 )
 
 //go:embed ui/templates/index.html
@@ -23,11 +24,15 @@ var mode string
 
 func main() {
 	config.LoadEnv(credentials, "credentials/env")
+	runtimeConfig := config.NewConfig(mode, os.Args[1:])
 	auth.SetSecretKey()
 	db.Connect()
-	db.MigrateDB()
 	cloud.PrepareClient(credentials, "credentials/gcp.json")
-	runtimeConfig := config.NewConfig(mode, os.Args[1:])
+	memcache.Init(memcache.NewGCPStorage(cloud.GetBucket(), "memcache.db"))
+
+	if runtimeConfig.AutoMigrate {
+		db.MigrateDB()
+	}
 
 	InitOAuthProviders()
 
