@@ -21,7 +21,7 @@
         <script type="text/javascript">
             window.AppConfig = {
                 title: 'AI Tutor',
-                host: 'http://localhost:3000',
+                baseUrl: '{{.BaseUrl}}',
             };
             window.PageData = JSON.parse('{{.PageData}}');
             console.log('PageData', window.PageData);

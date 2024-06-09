@@ -2,18 +2,19 @@ package room
 
 import (
 	"log"
+	"time"
 
 	"github.com/MaxRazen/tutor/internal/db"
 	"github.com/MaxRazen/tutor/internal/utils"
 )
 
 type RoomHistory struct {
-	ID            int            `json:"id"`
-	RoomId        int            `json:"-"`
-	Authorship    string         `json:"authorship"`
-	Transcription string         `json:"transcription"`
-	Recording     string         `json:"recording"`
-	CreatedAt     utils.JSONTime `json:"createdAt"`
+	ID            int       `json:"id"`
+	RoomId        int       `json:"-"`
+	Authorship    string    `json:"authorship"`
+	Transcription string    `json:"transcription"`
+	Recording     string    `json:"recording"`
+	CreatedAt     time.Time `json:"createdAt"`
 }
 
 func createRoomHistoryRecord(rh RoomHistory) error {
@@ -55,17 +56,13 @@ func LoadRoomHistory(roomId int) ([]RoomHistory, error) {
 			return records, err
 		}
 
-		if recording != "" {
-			recording = GetPublicAudioLink(recording)
-		}
-
 		records = append(records, RoomHistory{
 			ID:            id,
 			RoomId:        roomId,
 			Authorship:    authorship,
 			Transcription: transcription,
 			Recording:     recording,
-			CreatedAt:     utils.JSONTime(utils.ParseDatetime(createdAt)),
+			CreatedAt:     utils.ParseDatetime(createdAt),
 		})
 	}
 

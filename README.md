@@ -10,10 +10,10 @@
     - [x] Room creation
     - [x] Basic call mode UI
     - [x] Voice recording & saving to bucket
-    - [ ] Voice to text transformation
-    - [ ] Text request to GPT model
-    - [ ] Text to voice transformation
-    - [ ] Room history extraction
+    - [x] Voice to text transformation
+    - [x] Text request to GPT model
+    - [x] Text to voice transformation
+    - [x] Room history extraction
     - [ ] Context configurator
     - [ ] Call mode extended UI
 - [ ] Chat mode

@@ -20,7 +20,7 @@ type ServerConfig struct {
 	WatchMode bool
 }
 
-func InitServer(cfg config.RuntimeConfig) {
+func InitServer(cfg *config.RuntimeConfig) {
 	server := fiber.New()
 	routes.SetRootTemplate(&publicRoot)
 	authMiddleware := routes.AuthMiddleware()

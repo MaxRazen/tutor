@@ -51,15 +51,22 @@ const messageFactory = (msg: ResponseMessage): MessageContext => {
 export default function HistoryPanel(props: HistoryPanelProps) {
     const [messages, setMessages] = useState<MessageContext[]>([]);
 
-    props.wsConnection.onMessage((e: MessageEvent) => {
-        console.log('HistoryPanel :: onMessage');
-        console.log(e.data, typeof e.data);
+    const onMessageHandler = (e: MessageEvent) => {
         const msg: ResponseMessage = JSON.parse(e.data);
+        console.log('HistoryPanel :: onMessage', msg);
 
-        setMessages([
-            ...messages,
+        setMessages((prevMessages) => [
+            ...prevMessages,
             messageFactory(msg),
         ]);
+    }
+
+    useEffect(() => {
+        props.wsConnection.onConnect(() => {
+            setTimeout(() => console.log(messages.length), 2000);
+        })
+
+        props.wsConnection.onMessage(onMessageHandler);
     })
 
     return (

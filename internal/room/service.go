@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/MaxRazen/tutor/internal/cloud"
@@ -44,19 +45,56 @@ func GetPublicAudioLink(audio string) string {
 	return link
 }
 
+func SendInitMessage(roomId int, writer wsWriter) {
+	roomHistory, err := LoadRoomHistory(roomId)
+
+	if err != nil {
+		log.Println("room/service: initMsg:", err)
+		return
+	}
+
+	// deliver room history if it present
+	for _, rh := range roomHistory {
+		if rh.Recording != "" {
+			rh.Recording = GetPublicAudioLink(rh.Recording)
+		}
+		respMsg := response{
+			Type:          ResponseTypeRecording,
+			Timestamp:     rh.CreatedAt.Unix(),
+			Authorship:    rh.Authorship,
+			Content:       rh.Recording,
+			Transcription: rh.Transcription,
+		}
+		data, err := json.Marshal(respMsg)
+		if err != nil {
+			log.Println("room/service:", err)
+			continue
+		}
+		writer(data)
+	}
+
+	if len(roomHistory) > 0 && roomHistory[len(roomHistory)-1].Authorship == openai.RoleAssistant {
+		// TODO: send generic question to continue the conversation
+		// should not be written to history
+		return
+	}
+
+	// init chatGPT request with context
+	// TODO
+}
+
 func AcceptVoiceCommand(roomId int, audio []byte, writer wsWriter) {
-	_, err := processUserVoiceCommand(roomId, audio, writer)
+	rh, err := processUserVoiceCommand(roomId, audio, writer)
 
 	if err != nil {
 		return
 	}
 
-	// TODO: uncomment
-	// _, err = generateAssistantVoiceResponse(roomId, rh.Transcription, writer)
+	_, err = generateAssistantVoiceResponse(roomId, rh.Transcription, writer)
 
-	// if err != nil {
-	// 	return
-	// }
+	if err != nil {
+		return
+	}
 
 	log.Printf("User voice command accepted and processed successfully: room #%v", roomId)
 }
@@ -80,7 +118,7 @@ func processUserVoiceCommand(roomId int, audio []byte, writer wsWriter) (rh Room
 	if err != nil {
 		log.Printf("room/service: speech2text: %v", err)
 	} else {
-		transcription = transcriptionResponse.Text
+		transcription = extractTranscription(transcriptionResponse.Text)
 	}
 
 	rh = RoomHistory{
@@ -119,6 +157,16 @@ func generateAssistantVoiceResponse(roomId int, command string, writer wsWriter)
 
 	log.Println("generateAssistantVoiceResponse text command tobe processed", command)
 
+	callCtx := `You are an English tutor. Your name is Scarlett. You are between 25-30 years, you were born in London.
+	This conversation is going to be performed in the way of a call
+	(all the responses are provided by User and Assistant roles will be converted from audio to text and back).
+	Keep your responses short enough and simulate real conversation. Try to use open questions to develop the dialog.
+	If the User has made a mistake, correct him.`
+
+	chatMessages = append(chatMessages, openai.MessageContext{
+		Role:    openai.RoleSystem,
+		Content: callCtx,
+	})
 	chatMessages = append(chatMessages, openai.MessageContext{
 		Role:    openai.RoleUser,
 		Content: command,
@@ -212,4 +260,13 @@ func serverErrorResponse(msg ...string) []byte {
 	data, _ := json.Marshal(r)
 
 	return data
+}
+
+// Extracting text from Whisper's response
+// 1\n
+// 00:00:00,000 --> 00:00:10,000\n
+// text...\n
+func extractTranscription(rawText string) string {
+	ss := strings.Split(strings.Trim(rawText, "\n\t "), "\n")
+	return strings.Join(ss[2:], " ")
 }

@@ -62,16 +62,8 @@ func RoomShowHandler() routeHandler {
 			return c.SendStatus(http.StatusNotFound)
 		}
 
-		roomHistory, err := room.LoadRoomHistory(roomId)
-
-		if err != nil {
-			log.Println("routes/room:", err)
-			return c.SendStatus(http.StatusInternalServerError)
-		}
-
 		m := make(map[string]any)
 		m["roomId"] = roomId
-		m["history"] = roomHistory
 
 		data, _ := ui.NewTemplateData(m)
 

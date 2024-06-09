@@ -9,23 +9,30 @@ const (
 type RuntimeConfig struct {
 	Host        string
 	Port        string
-	URL         string
+	BaseUrl     string
 	DevMode     bool
 	AutoMigrate bool
 }
+
+var runtimeConfig *RuntimeConfig
 
 func (rc *RuntimeConfig) GetServerHost() string {
 	return rc.Host + ":" + rc.Port
 }
 
-func NewConfig(mode string, args []string) RuntimeConfig {
-	return RuntimeConfig{
+func NewConfig(mode string, args []string) *RuntimeConfig {
+	runtimeConfig = &RuntimeConfig{
 		Host:        getArg("--host", args, ""),
 		Port:        getArg("--port", args, "3000"),
-		URL:         getArg("--url", args, "http://localhost:3000"),
+		BaseUrl:     getArg("--base-url", args, "http://localhost:3000"),
 		DevMode:     mode == "devonly",
 		AutoMigrate: getArg("--auto-migrate", args, "") == FlagPresent,
 	}
+	return runtimeConfig
+}
+
+func GetRuntimeConfig() *RuntimeConfig {
+	return runtimeConfig
 }
 
 func getArg(key string, args []string, d string) string {

@@ -44,7 +44,6 @@ func RoomWebsocketHandler() routeHandler {
 		defer func() {
 			println("connection per room", c.Params("id"), "is closed")
 		}()
-		// TODO: Fetch Room metadata c.Params("id")
 
 		messages := make(chan incomingMessage)
 		go func() {
@@ -73,25 +72,14 @@ func RoomWebsocketHandler() routeHandler {
 			c.WriteMessage(websocket.TextMessage, data)
 		}
 
-		for message := range messages {
+		go room.SendInitMessage(roomId, msgWriter)
 
+		for message := range messages {
 			if message.Type == websocket.BinaryMessage {
-				// save recording in asynchronously
+				// save recording asynchronously
 				// TODO: add context
 				go room.AcceptVoiceCommand(roomId, message.Body, msgWriter)
 			}
-
-			// go func(msg []byte) {
-			// 	time.Sleep(time.Second * 5)
-			// 	url := cloud.SignUrl("recording.mp3", 60*10)
-
-			// 	m := fiber.Map{
-			// 		"type":    "audio",
-			// 		"content": url,
-			// 	}
-
-			// 	c.WriteJSON(m)
-			// }(message)
 		}
 	})
 }

@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 
 	"github.com/MaxRazen/tutor/internal/auth"
+	"github.com/MaxRazen/tutor/internal/config"
 )
 
 type TemplateData struct {
+	BaseUrl  string
 	PageData string `json:"pageData"`
 }
 
@@ -19,6 +21,7 @@ func NewTemplateData(data any) (TemplateData, error) {
 	}
 
 	td.PageData = string(b)
+	td.BaseUrl = config.GetRuntimeConfig().BaseUrl
 
 	return td, nil
 }

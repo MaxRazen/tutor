@@ -2,9 +2,9 @@ package routes
 
 import (
 	"embed"
-	"html/template"
 	"log"
 	"net/http"
+	"text/template"
 
 	"github.com/MaxRazen/tutor/internal/ui"
 	fiber "github.com/gofiber/fiber/v2"
